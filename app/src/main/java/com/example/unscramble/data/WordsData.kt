@@ -22,7 +22,7 @@ const val SCORE_INCREASE = 20
 // Set with all the words for the Game
 val allWords: Set<String> =
     setOf(
-        "animal",
+        "animal",   // TODO 前田さんに質問！stringリソースから取得する方法、なぜlistじゃないのか
         "auto",
         "anecdote",
         "alphabet",
