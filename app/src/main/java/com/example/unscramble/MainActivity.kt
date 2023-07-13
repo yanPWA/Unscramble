@@ -24,7 +24,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.unscramble.ui.GameScreen
+import com.example.unscramble.ui.InitialGameScreen
 import com.example.unscramble.ui.theme.UnscrambleTheme
+
+const val MAX_NO_OF_WORDS = 10
+const val SCORE_INCREASE = 20
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    GameScreen()
+                    InitialGameScreen()
                 }
             }
         }
