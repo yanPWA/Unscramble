@@ -1,5 +1,6 @@
 package com.example.unscramble.ui
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -97,6 +98,22 @@ class GameViewModel : ViewModel() {
         updateGameState(_uiState.value.score)
         // 単語入力欄を空にする
         updateUserGuess("")
+    }
+
+    /**
+     * 正解の単語リストを生成
+     */
+    fun createCorrectList(): String {
+        val correctList: MutableList<String> = emptyList<String>().toMutableList()
+        allWords.forEach {
+            // 問題に出した単語のみのリストを生成
+            if (it.isUsed) correctList.add(it.answer)
+        }
+
+        val separator = ", "
+        // 「,」で繋がったStringを生成
+        val str = correctList.joinToString(separator)
+        return str.replace(",", "\n")
     }
 
     /**

@@ -141,6 +141,7 @@ fun GameScreen(gameViewModel: GameViewModel) {
             if (gameUiState.isGameOver) {
                 FinalScoreDialog(
                     score = gameUiState.score,
+                    correctList = gameViewModel.createCorrectList(),
                     onPlayAgain = { gameViewModel.resetGame() }
                 )
             }
@@ -257,6 +258,7 @@ fun GameLayout(
 @Composable
 private fun FinalScoreDialog(
     score: Int,
+    correctList: String,
     onPlayAgain: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -265,7 +267,7 @@ private fun FinalScoreDialog(
     AlertDialog(
         onDismissRequest = {},
         title = { Text(text = stringResource(R.string.congratulations)) },
-        text = { Text(text = stringResource(R.string.you_scored, score)) },
+        text = { Text(text = stringResource(id = R.string.correct_list, score, correctList)) },
         modifier = modifier,
         dismissButton = {
             TextButton(
@@ -282,6 +284,39 @@ private fun FinalScoreDialog(
             }
         }
     )
+}
+
+@Composable
+private fun CorrectWordDialog(
+    word: String,
+    updateIsShowAnswer: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val openDialog = remember { mutableStateOf(true) }
+
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {},
+            text = {
+                Text(
+                    text = word,
+                    fontSize = 45.sp
+                )
+            },
+            modifier = modifier,
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                        updateIsShowAnswer(false)
+                    }
+                ) {
+                    Text(text = stringResource(R.string.close))
+                }
+            },
+            dismissButton = null
+        )
+    }
 }
 
 @Preview(showBackground = true)
