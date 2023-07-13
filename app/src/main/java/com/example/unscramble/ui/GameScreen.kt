@@ -16,6 +16,8 @@
 package com.example.unscramble.ui
 
 import android.app.Activity
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -57,16 +60,27 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
+import org.w3c.dom.Text
 
 @Composable
-fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
+fun InitialGameScreen(gameViewModel: GameViewModel = viewModel()) {
+    gameViewModel.allWords = stringArrayResource(id = R.array.all_words).map {
+        Word(answer = it)
+    }.toMutableList()
+    gameViewModel.resetGame()
+    GameScreen(gameViewModel)
+}
+
+
+@Composable
+fun GameScreen(gameViewModel: GameViewModel) {
     val gameUiState by gameViewModel.uiState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(mediumPadding),
+        ,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -80,7 +94,6 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                     vertical = 4.dp
                 ),
         )
-
         GameLayout(
             isGuessWrong = gameUiState.isGuessedWordWrong,
             onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
@@ -89,7 +102,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(mediumPadding),
-            currentScrambledWord = gameUiState.currentScrambledWord,
+            currentWord = gameUiState.currentWord,
             userGuess = gameViewModel.userGuess
         )
 
@@ -163,7 +176,7 @@ fun GameLayout(
     onUserGuessChanged: (String) -> Unit,
     onKeyboardDone: () -> Unit,
     modifier: Modifier = Modifier,
-    currentScrambledWord: String,
+    currentWord: Word,
     userGuess: String
 ) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
@@ -175,26 +188,31 @@ fun GameLayout(
         Column(
             verticalArrangement = Arrangement.spacedBy(mediumPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(mediumPadding)
+            modifier = Modifier.padding(
+                bottom = mediumPadding
+            )
         ) {
-            var name by remember { mutableStateOf("") }
-
             Text(
-                text = currentScrambledWord,
+                text = currentWord.shuffleWords,
                 fontSize = 45.sp,
                 modifier = Modifier
+                    .padding(top = mediumPadding)
                     .align(Alignment.CenterHorizontally)
             )
+
             Text(
                 text = stringResource(R.string.instructions),
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
+
             OutlinedTextField(
                 value = userGuess,
                 singleLine = true,
                 shape = shapes.large,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = mediumPadding),
                 colors = TextFieldDefaults.textFieldColors(containerColor = colorScheme.surface),
                 onValueChange = onUserGuessChanged,
                 label = {
@@ -228,11 +246,7 @@ private fun FinalScoreDialog(
     val activity = (LocalContext.current as Activity)
 
     AlertDialog(
-        onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
-        },
+        onDismissRequest = {},
         title = { Text(text = stringResource(R.string.congratulations)) },
         text = { Text(text = stringResource(R.string.you_scored, score)) },
         modifier = modifier,
@@ -257,16 +271,6 @@ private fun FinalScoreDialog(
 @Composable
 fun GameScreenPreview() {
     UnscrambleTheme {
-        GameScreen()
+        InitialGameScreen()
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FinalScoreDialogPreview() {
-    FinalScoreDialog(
-        score = 40,
-        onPlayAgain = {},
-        modifier = Modifier
-    )
 }
