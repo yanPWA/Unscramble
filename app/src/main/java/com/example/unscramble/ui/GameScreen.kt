@@ -98,6 +98,7 @@ fun GameScreen(gameViewModel: GameViewModel) {
             isGuessWrong = gameUiState.isGuessedWordWrong,
             onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
             onKeyboardDone = { gameViewModel.checkUserGuess() },
+            updateIsShowAnswer = gameViewModel::updateIsShowAnswer,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
@@ -143,6 +144,13 @@ fun GameScreen(gameViewModel: GameViewModel) {
                     onPlayAgain = { gameViewModel.resetGame() }
                 )
             }
+
+            if (gameUiState.isShowAnswer) {
+                CorrectWordDialog(
+                    word = gameUiState.currentWord.answer,
+                    updateIsShowAnswer = gameViewModel::updateIsShowAnswer
+                )
+            }
         }
     }
 }
@@ -175,6 +183,7 @@ fun GameLayout(
     isGuessWrong: Boolean,
     onUserGuessChanged: (String) -> Unit,
     onKeyboardDone: () -> Unit,
+    updateIsShowAnswer: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     currentWord: Word,
     userGuess: String
@@ -185,6 +194,14 @@ fun GameLayout(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
+        TextButton(
+            onClick = { updateIsShowAnswer(true) },
+            modifier = Modifier
+                .align(Alignment.End),
+        ) {
+            Text(text = stringResource(id = R.string.answer))
+        }
+
         Column(
             verticalArrangement = Arrangement.spacedBy(mediumPadding),
             horizontalAlignment = Alignment.CenterHorizontally,

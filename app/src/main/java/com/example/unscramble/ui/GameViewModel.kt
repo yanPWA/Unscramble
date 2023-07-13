@@ -98,4 +98,15 @@ class GameViewModel : ViewModel() {
         // 単語入力欄を空にする
         updateUserGuess("")
     }
+
+    /**
+     * isShowAnswerのフラグを更新
+     */
+    fun updateIsShowAnswer(isShow: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isShowAnswer = isShow
+            )
+        }
+    }
 }
