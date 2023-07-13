@@ -27,4 +27,8 @@
     <string name="exit">Exit</string>
     <string name="play_again">Play Again</string>
     <string name="wrong_guess">Wrong Guess!</string>
+    <string name="correct_list">"You scored: %d"\n\n----------------------\n正解一覧\n ----------------------\n %s</string>
+    <string name="close">Close</string>
+    <string name="correct">Correct</string>
+    <string name="answer">answer</string>
 </resources>
