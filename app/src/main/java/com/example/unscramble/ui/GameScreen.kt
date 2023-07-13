@@ -98,6 +98,7 @@ fun GameScreen(gameViewModel: GameViewModel) {
             isGuessWrong = gameUiState.isGuessedWordWrong,
             onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
             onKeyboardDone = { gameViewModel.checkUserGuess() },
+            updateIsShowAnswer = gameViewModel::updateIsShowAnswer,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
@@ -140,7 +141,15 @@ fun GameScreen(gameViewModel: GameViewModel) {
             if (gameUiState.isGameOver) {
                 FinalScoreDialog(
                     score = gameUiState.score,
+                    correctList = gameViewModel.createCorrectList(),
                     onPlayAgain = { gameViewModel.resetGame() }
+                )
+            }
+
+            if (gameUiState.isShowAnswer) {
+                CorrectWordDialog(
+                    word = gameUiState.currentWord.answer,
+                    updateIsShowAnswer = gameViewModel::updateIsShowAnswer
                 )
             }
         }
@@ -175,6 +184,7 @@ fun GameLayout(
     isGuessWrong: Boolean,
     onUserGuessChanged: (String) -> Unit,
     onKeyboardDone: () -> Unit,
+    updateIsShowAnswer: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     currentWord: Word,
     userGuess: String
@@ -185,6 +195,14 @@ fun GameLayout(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
+        TextButton(
+            onClick = { updateIsShowAnswer(true) },
+            modifier = Modifier
+                .align(Alignment.End),
+        ) {
+            Text(text = stringResource(id = R.string.answer))
+        }
+
         Column(
             verticalArrangement = Arrangement.spacedBy(mediumPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -240,6 +258,7 @@ fun GameLayout(
 @Composable
 private fun FinalScoreDialog(
     score: Int,
+    correctList: String,
     onPlayAgain: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -248,7 +267,7 @@ private fun FinalScoreDialog(
     AlertDialog(
         onDismissRequest = {},
         title = { Text(text = stringResource(R.string.congratulations)) },
-        text = { Text(text = stringResource(R.string.you_scored, score)) },
+        text = { Text(text = stringResource(id = R.string.correct_list, score, correctList)) },
         modifier = modifier,
         dismissButton = {
             TextButton(
@@ -265,6 +284,39 @@ private fun FinalScoreDialog(
             }
         }
     )
+}
+
+@Composable
+private fun CorrectWordDialog(
+    word: String,
+    updateIsShowAnswer: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val openDialog = remember { mutableStateOf(true) }
+
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {},
+            text = {
+                Text(
+                    text = word,
+                    fontSize = 45.sp
+                )
+            },
+            modifier = modifier,
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                        updateIsShowAnswer(false)
+                    }
+                ) {
+                    Text(text = stringResource(R.string.close))
+                }
+            },
+            dismissButton = null
+        )
+    }
 }
 
 @Preview(showBackground = true)
